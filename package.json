@@ -10,7 +10,8 @@
     "jsonwebtoken": "^1.1.2",
     "mongoose": "^3.8.12",
     "morgan": "~1.0.0",
-    "static-favicon": "~1.0.0"
+    "static-favicon": "~1.0.0",
+    "promise": "~6.0.1"
   },
   "engines": {
     "node": ">=0.10.x",
