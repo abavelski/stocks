@@ -21,7 +21,9 @@ app.use(morgan('short'))
   .use('/auth', expressJwt({secret: config.secret}))
 
 //mongoose.connect(config.mongoUrl);
-mongoose.connect(process.env.OPENSHIFT_MONGODB_DB_URL + process.env.OPENSHIFT_APP_NAME);
+var url = process.env.OPENSHIFT_MONGODB_DB_URL + process.env.OPENSHIFT_APP_NAME;
+console.log(url);
+mongoose.connect(url);
 mongoose.connection.on('error', console.error.bind(console, 'connection error:'));
 mongoose.connection.once('open', function() {
   
