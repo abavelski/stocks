@@ -1,7 +1,7 @@
 "use strict";
 
 module.exports = {
-    staticFolder: __dirname+ './dist',
+    staticFolder: __dirname+ '/dist/',
     secret : 'thisisasecret',
     mongoUrl : 'mongodb://192.168.1.192/mongoose',
     defaultCustody : {
