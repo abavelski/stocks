@@ -36,7 +36,7 @@ mongoose.connection.once('open', function() {
   custodies(router);
 
   app.use('/', router);
-  app.listen(process.env.OPENSHIFT_NODEJS_PORT || 8000);
+  app.listen(process.env.OPENSHIFT_NODEJS_PORT, process.env.OPENSHIFT_NODEJS_IP);
   console.log('Server started...');
 });
 
