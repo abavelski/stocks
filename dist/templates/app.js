@@ -32,7 +32,9 @@ angular.module("widgets/assetoverview/assetoverview.tpl.html", []).run(["$templa
     "	<div ng-controller=\"AssetOverviewCtrl\">\n" +
     "	<table ng-table=\"tableParams\" template-pagination=\"widgets/assetoverview/pager.tpl.html\" class=\"table\">\n" +
     "        <tr ng-repeat=\"holding in $data\">            \n" +
+    "            <td data-title=\"'Name'\"><a href=\"#/instrument/{{holding.symbol}}/details\">{{holding.name}}</a></td>\n" +
     "            <td data-title=\"'Symbol'\">{{holding.symbol}}</td>\n" +
+    "            <td data-title=\"'Last'\">{{holding.last}}</td>\n" +
     "            <td data-title=\"'Amount'\">{{holding.amount}}</td>\n" +
     "            <td data-title=\"'Avg. purchase price'\">{{holding.avgPurchasePrice}}</td>\n" +
     "        </tr>\n" +
@@ -61,9 +63,9 @@ angular.module("widgets/cashaccounts/cashaccounts.tpl.html", []).run(["$template
     "		<div ng-show=\"error\" class=\"alert alert-danger\" role=\"alert\">{{error}}</div>\n" +
     "		<table ng-table=\"tableParams\" class=\"table\">\n" +
     "			<tr ng-repeat=\"cashAccount in cashAccounts\">\n" +
-    "				<td data-title=\"'Name'\"><a href=\"#/cashaccount/{{cashAccount._id}}/details\">{{cashAccount.name}}</a></td>\n" +
+    "				<td data-title=\"'Name'\">{{cashAccount.name}}</td>\n" +
     "				<td data-title=\"'Currency'\">{{cashAccount.currency}}</td>\n" +
-    "				<td data-title=\"'Balance'\">{{cashAccount.balance}}</td>\n" +
+    "				<td data-title=\"'Balance'\">{{cashAccount.balance | number:2}}</td>\n" +
     "			</tr>\n" +
     "		</table>\n" +
     "		\n" +
@@ -90,8 +92,13 @@ angular.module("widgets/custodies/custodies.tpl.html", []).run(["$templateCache"
     "	<div ng-controller=\"CustodiesCtrl\">\n" +
     "		<div ng-show=\"error\" class=\"alert alert-danger\" role=\"alert\">{{error}}</div>\n" +
     "		<table ng-table=\"tableParams\" class=\"table\">\n" +
-    "			<tr ng-repeat=\"custody in custodies\">\n" +
+    "			<tr ng-repeat=\"custody in $data\">\n" +
     "				<td data-title=\"'Name'\"><a href=\"#/assetoverview/{{custody._id}}\">{{custody.name}}</a></td>\n" +
+    "				<td data-title=\"'Total'\">{{custody.total | number:2}}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "    			<td></td>\n" +
+    "    			<td><b>{{custodiesTotal | number:2}}</b></td>\n" +
     "			</tr>\n" +
     "		</table>\n" +
     "		\n" +

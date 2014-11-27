@@ -56,6 +56,33 @@ router.route('/auth/custody').post(function(req, res){
   }
 });
 
+//instruments
+router.route('/auth/instruments').get(function(req, res){
+  User.findById(req.user.id).exec().then(function(user){
+      var symbols = user.getAllSymbols();
+      console.log('symbols:',symbols);
+      stockInfo
+        .forSymbols(symbols)
+        .withFields(['symbol', 'name', 'lastTradePrice'])
+        .getStocks()
+        .then(function(stocks) {
+          console.log(stocks);
+          result = {};
+          for (var i = 0; i<stocks.length; i++) {
+            stocks[i].lastTradePrice = Number(stocks[i].lastTradePrice);
+            result[stocks[i].symbol] = stocks[i];
+          }
+          res.json(result);
+        },
+          function(err) {
+            res.send(500).end();
+          });
+    }, function(err){
+      res.send(500).end();
+    });
+
+});
+
 //add new cash account
 router.route('/auth/cash-account').post(function(req, res){
   if (!req.body.name || !req.body.currency) {

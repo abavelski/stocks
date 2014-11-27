@@ -77,8 +77,9 @@ module.exports = function(router) {
         });
       };
 
-      var onSuccess = function() {
-        res.send(201).end();
+      var onSuccess = function(user) {
+        console.log(user);
+        res.json(user);
       };
 
       var onReject = function(err) {

@@ -60,6 +60,20 @@ userSchema.methods.getCustodyAccountById = function(id) {
 	return acc;
 };
 
+userSchema.methods.getAllSymbols = function() {
+	var holdings = [];
+	var symbols = [];
+	this.custodyAccounts.forEach(function(custodyAccount){
+		holdings = holdings.concat(custodyAccount.holdings);
+	});
+	for (var i =0; i<holdings.length; i++) {
+		if (symbols.indexOf(holdings[i].symbol)==-1) {
+			symbols.push(holdings[i].symbol);
+		}
+	}
+	return symbols;
+};
+
 
 userSchema.statics.addCustody = function(userId, custody, callback){
 	this.findById(userId, function (err, user) {

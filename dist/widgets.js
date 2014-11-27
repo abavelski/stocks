@@ -1,4 +1,4 @@
-/*! widgets - v0.0.1-SNAPSHOT - 2014-11-19 */
+/*! widgets - v0.0.1-SNAPSHOT - 2014-11-27 */
 angular.module('app', [ 'templates.app', 'templates.common', 'security','layouts', 'widget', 'widgets'])
 
 .controller('AppCtrl', ['$scope', function($scope) {}])
@@ -62,13 +62,33 @@ angular.module('widgets.cashaccounts', ['storage'])
 angular.module('widgets.custodies', ['storage'])
 
 .controller('CustodiesCtrl', function($scope, $http, storage, ngTableParams){
-  $scope.custodies = storage.getCustodies();
   $scope.custody = {};
+  $scope.custodies = storage.getCustodies();  
+  $scope.custodiesTotal = 0;
   $scope.tableParams = new ngTableParams({
-    count: $scope.custodies.length 
-    },{
-    counts: [] 
+        page: 1,            
+        count: 5
+    }, {
+        total : 5,
+        counts : [],
+        getData: function($defer, params) {
+          var custodies = storage.getCustodies();  
+          $http.get('/auth/instruments').success(function(instruments) {
+          console.log(instruments);
+          custodies = custodies.map(function(custody) {
+                custody.total = 0;
+                for( var i =0; i<custody.holdings.length; i++) {
+                  var instr = instruments[custody.holdings[i].symbol];
+                  custody.total+=(instr.lastTradePrice*custody.holdings[i].amount);
+                }
+                $scope.custodiesTotal+=custody.total;
+                return custody;
+              });
+          $defer.resolve(custodies);
+          });            
+        }
     });
+
   $scope.addCustody = function() {
   	if (!$scope.custody.name) {
   		$scope.error = "Name should not be empty";
@@ -244,7 +264,7 @@ angular.module('widgets.tradeflow', ['mgo-angular-wizard', 'storage'])
     }); 
     $scope.nextBtn = 'Next';
     $scope.currentStep = '';
-	$scope.orderTypes = ['Instant', 'Limit', 'Trigger'];
+	$scope.orderTypes = ['Instant'];
 	$scope.custodies = storage.getCustodies();
 	$scope.cashAccounts = storage.getCashAccounts();
 	$scope.order = {
@@ -255,9 +275,19 @@ angular.module('widgets.tradeflow', ['mgo-angular-wizard', 'storage'])
 		cashAccount : $scope.cashAccounts[0],
 		amount : 1
 	};
+	var updateBuyTotal = function() {
+		$scope.total = $scope.order.amount * $scope.instrument.ask + $scope.commission;
+	};
+	var updateSellTotal = function() {
+		$scope.total = $scope.order.amount * $scope.instrument.bid + $scope.commission;
+	};
 	var updateTotal = function() {
-		$scope.total = $scope.order.amount*$scope.instrument.ask + $scope.commission
-	}
+		if ($scope.order.orderType=='buy') {
+			updateBuyTotal();
+		} else {
+			updateSellTotal();
+		}
+	};
 	$scope.next = function() {
 		if ($scope.currentStep=='select') {
 			updateTotal();
@@ -268,6 +298,7 @@ angular.module('widgets.tradeflow', ['mgo-angular-wizard', 'storage'])
 			$http.post('/auth/order', $scope.order)
 			 .success(function(res) {
                 console.log(res);
+                storage.saveUser(res);
                 WizardHandler.wizard().next();
             })
             .error(function(err) {
@@ -482,6 +513,12 @@ angular.module('storage', [])
 
 .factory('storage', function($window) {
     var storage = {
+        updateSymbols : function(instruments) {
+            $window.sessionStorage.instruments = JSON.stringify(instruments);
+        },
+        getInstruments : function() {
+            return JSON.parse($window.sessionStorage.instruments);
+        },
     	saveUser : function(user) {
     		$window.sessionStorage.user = JSON.stringify(user);
           },
@@ -607,7 +644,9 @@ angular.module("widgets/assetoverview/assetoverview.tpl.html", []).run(["$templa
     "	<div ng-controller=\"AssetOverviewCtrl\">\n" +
     "	<table ng-table=\"tableParams\" template-pagination=\"widgets/assetoverview/pager.tpl.html\" class=\"table\">\n" +
     "        <tr ng-repeat=\"holding in $data\">            \n" +
+    "            <td data-title=\"'Name'\"><a href=\"#/instrument/{{holding.symbol}}/details\">{{holding.name}}</a></td>\n" +
     "            <td data-title=\"'Symbol'\">{{holding.symbol}}</td>\n" +
+    "            <td data-title=\"'Last'\">{{holding.last}}</td>\n" +
     "            <td data-title=\"'Amount'\">{{holding.amount}}</td>\n" +
     "            <td data-title=\"'Avg. purchase price'\">{{holding.avgPurchasePrice}}</td>\n" +
     "        </tr>\n" +
@@ -636,9 +675,9 @@ angular.module("widgets/cashaccounts/cashaccounts.tpl.html", []).run(["$template
     "		<div ng-show=\"error\" class=\"alert alert-danger\" role=\"alert\">{{error}}</div>\n" +
     "		<table ng-table=\"tableParams\" class=\"table\">\n" +
     "			<tr ng-repeat=\"cashAccount in cashAccounts\">\n" +
-    "				<td data-title=\"'Name'\"><a href=\"#/cashaccount/{{cashAccount._id}}/details\">{{cashAccount.name}}</a></td>\n" +
+    "				<td data-title=\"'Name'\">{{cashAccount.name}}</td>\n" +
     "				<td data-title=\"'Currency'\">{{cashAccount.currency}}</td>\n" +
-    "				<td data-title=\"'Balance'\">{{cashAccount.balance}}</td>\n" +
+    "				<td data-title=\"'Balance'\">{{cashAccount.balance | number:2}}</td>\n" +
     "			</tr>\n" +
     "		</table>\n" +
     "		\n" +
@@ -665,8 +704,13 @@ angular.module("widgets/custodies/custodies.tpl.html", []).run(["$templateCache"
     "	<div ng-controller=\"CustodiesCtrl\">\n" +
     "		<div ng-show=\"error\" class=\"alert alert-danger\" role=\"alert\">{{error}}</div>\n" +
     "		<table ng-table=\"tableParams\" class=\"table\">\n" +
-    "			<tr ng-repeat=\"custody in custodies\">\n" +
+    "			<tr ng-repeat=\"custody in $data\">\n" +
     "				<td data-title=\"'Name'\"><a href=\"#/assetoverview/{{custody._id}}\">{{custody.name}}</a></td>\n" +
+    "				<td data-title=\"'Total'\">{{custody.total | number:2}}</td>\n" +
+    "			</tr>\n" +
+    "			<tr>\n" +
+    "    			<td></td>\n" +
+    "    			<td><b>{{custodiesTotal | number:2}}</b></td>\n" +
     "			</tr>\n" +
     "		</table>\n" +
     "		\n" +
