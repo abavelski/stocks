@@ -1,3 +1,4 @@
+'use strict';
 var http = require('http');
 var csv = require('csv');
 var Promise = require('promise');
@@ -45,7 +46,9 @@ var StockInfo = function() {
             var requestURL =  "http://download.finance.yahoo.com/d/quotes.csv?s="+getStockList()+"&f="+getColumns(myFields);
 
             http.get(requestURL, function(res) {
-                if ( res.statusCode!=200) throw new Error("Error: "+res.statusCode);
+                if ( res.statusCode!==200) {
+                    throw new Error("Error: "+res.statusCode);
+                }
                 csv().from.stream(res).to.array(function(stocksData) {
                     resolve(transformData(stocksData));
                 });
@@ -66,7 +69,7 @@ var StockInfo = function() {
     var transformData = function(arr) {
         var res = [];
         for (var i=0; i<arr.length;i++) {
-            var obj = {}
+            var obj = {};
             for (var j=0; j<myFields.length; j++) {
                 obj[myFields[j]]=arr[i][j];
             }

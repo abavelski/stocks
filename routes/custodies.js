@@ -1,9 +1,10 @@
+'use strict';
 var errors = require('../errors'),
 User = require('../db/models/user'),
 stockInfo = require('../api/finance/stockInfo');
 
 var buildAllCustody = function(custodies) {
-	if (!custodies || custodies.length==0) {
+	if (!custodies || custodies.length===0) {
 		return null;
 	}
 
@@ -48,8 +49,8 @@ module.exports = function(router) {
 	router.route('/auth/custodies/:id').get(function(req, res){
 		User.findById(req.user.id).exec().then(function(user){
 			var holdings = [];
-			if (req.params.id=='ALL') {
-				var holdings = buildAllCustody(user.custodyAccounts);
+			if (req.params.id==='ALL') {
+				holdings = buildAllCustody(user.custodyAccounts);
 			} else {
 				holdings = user.getCustodyAccountById(req.params.id).holdings;
 			}
@@ -66,16 +67,17 @@ module.exports = function(router) {
           			for (var i = 0; i<stocks.length; i++) {
             			stocks[i].lastTradePrice = Number(stocks[i].lastTradePrice);
             			map[stocks[i].symbol] = stocks[i];
-          			};
+          			}
           			for (i=0; i<holdings.length; i++) {
           				result.push({
           					symbol : holdings[i].symbol,
           					amount : holdings[i].amount,
-          					avgPurchasePrice : holdings[i].avgPurchasePrice,
+							total : holdings[i].amount * map[holdings[i].symbol].lastTradePrice,
           					last : map[holdings[i].symbol].lastTradePrice,
+							pl :  holdings[i].amount * map[holdings[i].symbol].lastTradePrice - holdings[i].amount * holdings[i].avgPurchasePrice,
           					name : map[holdings[i].symbol].name
           				});
-          			};
+          			}
           			res.json(result);
            		},
           		function(err) {

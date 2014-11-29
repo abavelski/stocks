@@ -1,4 +1,5 @@
-/*! widgets - v0.0.1-SNAPSHOT - 2014-11-27 */
+/*! widgets - v0.0.1-SNAPSHOT - 2014-11-29 */
+'use strict';
 angular.module('app', [ 'templates.app', 'templates.common', 'security','layouts', 'widget', 'widgets'])
 
 .controller('AppCtrl', ['$scope', function($scope) {}])
@@ -7,11 +8,21 @@ angular.module('app', [ 'templates.app', 'templates.common', 'security','layouts
   		$scope.isActive = function(str){ return $location.path().search(str)>-1; };
   		$scope.isAuthenticated = security.isAuthenticated;
   		$location.path('/instruments');
+
+		$scope.$watch(function() {
+			return security.currentUser;
+		}, function(currentUser, oldUser) {
+			if (currentUser && !oldUser) {
+				$location.path('/home');
+			}
+		});
+
 })
 .run(function(security, $window){
 	$window.addToHomescreen();
 	security.updateCurrentUser();
-})
+});
+'use strict';
 angular.module('widgets.assetoverview', [])
 
 .controller('AssetOverviewCtrl', function($scope, $http, $routeParams, ngTableParams){
@@ -59,6 +70,7 @@ angular.module('widgets.cashaccounts', ['storage'])
   	return $scope.cashAccounts.length<5;
   }
 });
+'use strict';
 angular.module('widgets.custodies', ['storage'])
 
 .controller('CustodiesCtrl', function($scope, $http, storage, ngTableParams){
@@ -97,19 +109,20 @@ angular.module('widgets.custodies', ['storage'])
     $http.post('/auth/custody', $scope.custody)
         .success(function(custody) {
                 console.log(custody);
-                $scope.custodies.push(custody)
+                $scope.custodies.push(custody);
                 storage.addCustody(custody);
                 $scope.custody = {};
             })
             .error(function(err) {
                     $scope.error = err.error;
             });
-  }
+  };
 
   $scope.isAddCustodyAllowed = function() {
   	return $scope.custodies.length<5;
-  }
+  };
 });
+'use strict';
 angular.module('widgets.custodyselector', ['storage'])
 
 .controller('CustodySelectorCtrl', function($scope, storage, $routeParams){
@@ -119,7 +132,7 @@ angular.module('widgets.custodyselector', ['storage'])
   $scope.custody = $scope.custodies[0];
     
   $scope.custodies.forEach(function(custody){
-    if (custody._id==$routeParams.id) {
+    if (custody._id===$routeParams.id) {
       $scope.custody = custody;
     }
   });
@@ -130,6 +143,7 @@ angular.module('widgets.custodyselector', ['storage'])
 
 
 });
+'use strict';
 angular.module('widgets.graph', [])
 
 .directive('graph', function() {
@@ -138,6 +152,9 @@ angular.module('widgets.graph', [])
       link: function(scope, element, attrs) {
           scope.getData(function(data){
             element.highcharts('StockChart', {
+              rangeSelector : {
+                  inputEnabled: false
+              },
               credits: {
                 enabled: false
               },
@@ -148,13 +165,13 @@ angular.module('widgets.graph', [])
             });
           });
       }
-    }
+    };
 })
 
 .controller('GraphCtrl', function($scope, $http, $routeParams){
   $scope.getData = function(callback) {
     $http.get('/api/companies/history/'+$routeParams.symbol).success(callback);
-  }
+  };
 
 });
 angular.module('widgets', [
@@ -167,7 +184,9 @@ angular.module('widgets', [
   'widgets.cashaccounts',
   'widgets.assetoverview',
   'widgets.tradeflow',
-  'widgets.custodyselector']);
+  'widgets.custodyselector',
+  'widgets.dashboard',
+  'widgets.tradebuttons']);
 angular.module('widgets.instrumentlist', [])
 
 .controller('InstrumentListCtrl', function($scope, $http, ngTableParams){
@@ -182,6 +201,15 @@ angular.module('widgets.instrumentlist', [])
         }
     });
 });
+'use strict';
+angular.module('widgets.dashboard', [])
+    .controller('DashboardCtrl', function($scope, $http){
+        $scope.summary = {};
+        $http.get('/auth/user/summary').success(function(data){
+           $scope.summary = data;
+        });
+
+    });
 angular.module('widgets.register', [])
     .controller('RegisterUserCtrl', function ($scope, $http, $location, security) {
         $scope.user = {};
@@ -210,6 +238,7 @@ angular.module('widgets.search', ['ui.bootstrap.typeahead', 'ui.bootstrap.tpls']
     $location.path('/instrument/'+item.symbol+'/details');
   };
 });
+'use strict';
 angular.module('widgets.stockinfo', ['ngTable'])
 
 .factory('StockInfoLabels', function() {
@@ -255,6 +284,22 @@ angular.module('widgets.stockinfo', ['ngTable'])
         }
     });
 });
+'use strict';
+angular.module('widgets.tradebuttons', ['storage', 'security'])
+    .controller('TradeButtonsCtrl', function($scope, $routeParams, storage, security){
+        $scope.symbol = $routeParams.symbol;
+        var sell = false;
+        storage.getCustodies().map(function(custody) {
+            for( var i =0; i<custody.holdings.length; i++) {
+              if(custody.holdings[i].symbol===$scope.symbol) {
+                  sell = true;
+              }
+            }
+        });
+        $scope.sellDisabled = !sell;
+        $scope.isLoggedIn = security.isAuthenticated();
+    });
+'use strict';
 angular.module('widgets.tradeflow', ['mgo-angular-wizard', 'storage'])
 
 .controller('TradeFlowCtrl', function($scope, WizardHandler, $routeParams, $http, storage, $location){
@@ -282,22 +327,21 @@ angular.module('widgets.tradeflow', ['mgo-angular-wizard', 'storage'])
 		$scope.total = $scope.order.amount * $scope.instrument.bid + $scope.commission;
 	};
 	var updateTotal = function() {
-		if ($scope.order.orderType=='buy') {
+		if ($scope.order.action==='buy') {
 			updateBuyTotal();
 		} else {
 			updateSellTotal();
 		}
 	};
 	$scope.next = function() {
-		if ($scope.currentStep=='select') {
+		if ($scope.currentStep==='select') {
 			updateTotal();
 			WizardHandler.wizard().next();
 		}
-		if ($scope.currentStep=='confirm') {
+		if ($scope.currentStep==='confirm') {
 			$scope.nextBtn = 'Finish';
 			$http.post('/auth/order', $scope.order)
 			 .success(function(res) {
-                console.log(res);
                 storage.saveUser(res);
                 WizardHandler.wizard().next();
             })
@@ -305,7 +349,7 @@ angular.module('widgets.tradeflow', ['mgo-angular-wizard', 'storage'])
                     $scope.error = err.error;
             });
 		} 
-		if ($scope.currentStep=='reciept') {
+		if ($scope.currentStep==='reciept') {
 			$location.path('/home');
 		}		
   		
@@ -315,8 +359,9 @@ angular.module('widgets.tradeflow', ['mgo-angular-wizard', 'storage'])
   	$scope.total = 0;
 
   
-})
+});
 
+'use strict';
 angular.module('layouts', ['ngRoute'])
 
 .factory('WidgetFactory', function() {
@@ -331,8 +376,10 @@ angular.module('layouts', ['ngRoute'])
       cashAccounts : 'widgets/cashaccounts/cashaccounts.tpl.html',
       tradeFlow : 'widgets/tradeflow/tradeflow.tpl.html',
       assetOverview : 'widgets/assetoverview/assetoverview.tpl.html',
-      custodySelector : 'widgets/custodyselector/custodyselector.tpl.html'
-    }
+      custodySelector : 'widgets/custodyselector/custodyselector.tpl.html',
+      dashboard : 'widgets/maindashboard/dashboard.tpl.html',
+      tradeButtons : 'widgets/tradebuttons/tradebuttons.tpl.html'
+    };
 })
 
 .config( function($routeProvider) {
@@ -340,7 +387,7 @@ angular.module('layouts', ['ngRoute'])
     twelveSixSix : 'layouts/twelveSixSix.tpl.html',
     twelveZeroZero : 'layouts/twelveZeroZero.tpl.html',
     zeroSixSix : 'layouts/zeroSixSix.tpl.html'
-  }
+  };
  
     var myConfig = window.myAppConfig;
       for (var i=0; i<myConfig.views.length; i++) {
@@ -353,31 +400,32 @@ angular.module('layouts', ['ngRoute'])
 
 .controller('ViewCtrl', function($scope, WidgetFactory, $location, $route, $window) {
     var setupView = function(widgets) {
+      var i;
       if (widgets.north) {
         $scope.northItems = [];
-        for (var i = 0; i < widgets.north.length; i++) {
+        for (i = 0; i < widgets.north.length; i++) {
           $scope.northItems.push(WidgetFactory[widgets.north[i]]);
-        };
+        }
       }
 
       if (widgets.east) {
         $scope.eastItems=[];
-        for (var i = 0; i < widgets.east.length; i++) {
+        for (i = 0; i < widgets.east.length; i++) {
           $scope.eastItems.push(WidgetFactory[widgets.east[i]]);
-        };
+        }
       }
 
       if (widgets.west) {
         $scope.westItems=[];
-        for (var i = 0; i < widgets.west.length; i++) {
+        for (i = 0; i < widgets.west.length; i++) {
           $scope.westItems.push(WidgetFactory[widgets.west[i]]);
-        };
+        }
       }
     };
     var myViews = $window.myAppConfig.views;
     for (var i=0; i<myViews.length; i++) {
       if (myViews[i].path === $route.current.$$route.originalPath) {
-        setupView(myViews[i].widgets)
+        setupView(myViews[i].widgets);
       }
     }
   });
@@ -385,6 +433,7 @@ angular.module('security', [
   'security.service',
   'security.login']);
 
+'use strict';
 angular.module('security.login.form', [])
 
 .controller('LoginFormController', function($scope, $modalInstance, security) {
@@ -408,6 +457,7 @@ angular.module('security.login.form', [])
 });
 
 angular.module('security.login', ['security.login.form', 'security.login.toolbar']);
+'use strict';
 angular.module('security.login.toolbar', [])
 
 .directive('loginToolbar', function(security) {
@@ -429,6 +479,7 @@ angular.module('security.login.toolbar', [])
   };
   return directive;
 });
+'use strict';
 angular.module('security.service', ['security.login','ui.bootstrap', 'storage'])
 
 .factory('security', function($http, $q, $location, $modal, storage) {
@@ -497,7 +548,7 @@ angular.module('security.service', ['security.login','ui.bootstrap', 'storage'])
     },
     response: function (response) {
       if (response.status === 401) {
-        // handle the case where the user is not authenticated
+        // TODO: handle the case where the user is not authenticated
       }
       return response || $q.when(response);
     }
@@ -572,6 +623,7 @@ angular.module('storage', [])
     }
     return storage;
 })
+'use strict';
 angular.module('widget', [])
   .directive('widget', function() {
     return {
@@ -595,7 +647,7 @@ angular.module('widget', [])
      link: function(scope, element, attrs) {
       scope.state = "glyphicon-minus";
       scope.toggle = function() {
-      	if (scope.state=='glyphicon-minus') {
+      	if (scope.state==='glyphicon-minus') {
       		element.find('.panel-body').slideUp(function() {});
       		scope.state = 'glyphicon-plus';
       	} else {	
@@ -606,11 +658,11 @@ angular.module('widget', [])
       };
       scope.remove = function() {
       	element.hide();
-      }
+      };
     }
-    }
+    };
   });
-angular.module('templates.app', ['header.tpl.html', 'widgets/assetoverview/assetoverview.tpl.html', 'widgets/assetoverview/pager.tpl.html', 'widgets/cashaccounts/cashaccounts.tpl.html', 'widgets/custodies/custodies.tpl.html', 'widgets/custodyselector/custodyselector.tpl.html', 'widgets/graph/graph.tpl.html', 'widgets/instrumentlist/instrumentList.tpl.html', 'widgets/instrumentlist/pager.tpl.html', 'widgets/register/registerOk.tpl.html', 'widgets/register/registerUser.tpl.html', 'widgets/search/search.tpl.html', 'widgets/search/typeahead.tpl.html', 'widgets/stockinfo/stockInfo.tpl.html', 'widgets/tradeflow/confirm.tpl.html', 'widgets/tradeflow/reciept.tpl.html', 'widgets/tradeflow/select.tpl.html', 'widgets/tradeflow/tradeflow.tpl.html']);
+angular.module('templates.app', ['header.tpl.html', 'widgets/assetoverview/assetoverview.tpl.html', 'widgets/assetoverview/pager.tpl.html', 'widgets/cashaccounts/cashaccounts.tpl.html', 'widgets/custodies/custodies.tpl.html', 'widgets/custodyselector/custodyselector.tpl.html', 'widgets/graph/graph.tpl.html', 'widgets/instrumentlist/instrumentList.tpl.html', 'widgets/instrumentlist/pager.tpl.html', 'widgets/maindashboard/dashboard.tpl.html', 'widgets/register/registerOk.tpl.html', 'widgets/register/registerUser.tpl.html', 'widgets/search/search.tpl.html', 'widgets/search/typeahead.tpl.html', 'widgets/stockinfo/stockInfo.tpl.html', 'widgets/tradebuttons/tradebuttons.tpl.html', 'widgets/tradeflow/confirm.tpl.html', 'widgets/tradeflow/reciept.tpl.html', 'widgets/tradeflow/select.tpl.html', 'widgets/tradeflow/tradeflow.tpl.html']);
 
 angular.module("header.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("header.tpl.html",
@@ -645,10 +697,10 @@ angular.module("widgets/assetoverview/assetoverview.tpl.html", []).run(["$templa
     "	<table ng-table=\"tableParams\" template-pagination=\"widgets/assetoverview/pager.tpl.html\" class=\"table\">\n" +
     "        <tr ng-repeat=\"holding in $data\">            \n" +
     "            <td data-title=\"'Name'\"><a href=\"#/instrument/{{holding.symbol}}/details\">{{holding.name}}</a></td>\n" +
-    "            <td data-title=\"'Symbol'\">{{holding.symbol}}</td>\n" +
-    "            <td data-title=\"'Last'\">{{holding.last}}</td>\n" +
+    "            <td data-title=\"'Last'\">{{holding.last | number:2}}</td>\n" +
     "            <td data-title=\"'Amount'\">{{holding.amount}}</td>\n" +
-    "            <td data-title=\"'Avg. purchase price'\">{{holding.avgPurchasePrice}}</td>\n" +
+    "            <td data-title=\"'Total'\">{{holding.total | number:2}}</td>\n" +
+    "            <td data-title=\"'Profit/Loss'\">{{holding.pl | number:2}}</td>\n" +
     "        </tr>\n" +
     "        </table>\n" +
     "    </div>\n" +
@@ -738,7 +790,7 @@ angular.module("widgets/custodyselector/custodyselector.tpl.html", []).run(["$te
     "    <div class=\"clearfix margin-bottom-20\">\n" +
     "\n" +
     "    	    <div class=\"pull-right btn-group\" dropdown is-open=\"status.isopen\">\n" +
-    "      <button type=\"button\" class=\"btn btn-primary dropdown-toggle\" ng-disabled=\"disabled\">\n" +
+    "      <button type=\"button\" class=\"btn btn-warning dropdown-toggle\" ng-disabled=\"disabled\">\n" +
     "        {{custody.name}}<span class=\"caret\"></span>\n" +
     "      </button>\n" +
     "      <ul class=\"dropdown-menu\" role=\"menu\">\n" +
@@ -792,6 +844,51 @@ angular.module("widgets/instrumentlist/pager.tpl.html", []).run(["$templateCache
     "            <a ng-switch-when=\"next\" ng-click=\"params.page(page.number)\" href=\"\">Next &raquo;</a>\n" +
     "          </li>\n" +
     "        </ul>");
+}]);
+
+angular.module("widgets/maindashboard/dashboard.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("widgets/maindashboard/dashboard.tpl.html",
+    "<div ng-controller=\"DashboardCtrl\">\n" +
+    "        <div class=\"row\">\n" +
+    "            <div class=\"col-sm-3 col-xs-4 zero-padding-right\">\n" +
+    "                <div class=\"hero-widget well well-sm\">\n" +
+    "                    <div class=\"text\">\n" +
+    "                        <var>{{summary.total | number:2}}</var>\n" +
+    "                        <label class=\"text-muted\">Total</label>\n" +
+    "                    </div>\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "            <div class=\"col-sm-3 col-xs-4 zero-padding\">\n" +
+    "                <div class=\"hero-widget well well-sm\">\n" +
+    "                    <div class=\"text\">\n" +
+    "                        <var>{{summary.holdings | number:2}}</var>\n" +
+    "                        <label class=\"text-muted\">Holdings</label>\n" +
+    "                    </div>\n" +
+    "\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "            <div class=\"col-sm-3 zero-padding hidden-xs\">\n" +
+    "                <div class=\"hero-widget well well-sm\">\n" +
+    "                    <div class=\"text\">\n" +
+    "                        <var>{{summary.cash | number:2}}</var>\n" +
+    "                        <label class=\"text-muted\">Cash</label>\n" +
+    "                    </div>\n" +
+    "\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "            <div class=\"col-sm-3 col-xs-4 zero-padding-left\">\n" +
+    "                <div class=\"hero-widget well well-sm\">\n" +
+    "                    <div class=\"text\">\n" +
+    "                        <var>{{summary.pl | number:2}}</var>\n" +
+    "                        <label class=\"text-muted\">Profit/Loss</label>\n" +
+    "                    </div>\n" +
+    "\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "        </div>\n" +
+    "\n" +
+    "\n" +
+    "</div>");
 }]);
 
 angular.module("widgets/register/registerOk.tpl.html", []).run(["$templateCache", function($templateCache) {
@@ -874,7 +971,6 @@ angular.module("widgets/stockinfo/stockInfo.tpl.html", []).run(["$templateCache"
   $templateCache.put("widgets/stockinfo/stockInfo.tpl.html",
     "<div ng-controller=\"StockInfoCtrl\">\n" +
     "<widget title=\"Stock Info\" minimizable=\"true\" removable=\"true\">\n" +
-    "	<a class=\"btn btn-primary\" href=\"#/tradeflow/buy/instrument/{{symbol}}\">BUY</a>\n" +
     "	<table ng-table=\"tableParams\" class=\"table\">\n" +
     "        <tr ng-repeat=\"row in $data\">\n" +
     "            <td>{{row.name}}</td>\n" +
@@ -882,6 +978,16 @@ angular.module("widgets/stockinfo/stockInfo.tpl.html", []).run(["$templateCache"
     "        </tr>\n" +
     "        </table>\n" +
     "</widget>\n" +
+    "</div>");
+}]);
+
+angular.module("widgets/tradebuttons/tradebuttons.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("widgets/tradebuttons/tradebuttons.tpl.html",
+    "<div ng-controller=\"TradeButtonsCtrl\">\n" +
+    "    <div class=\"margin-bottom-20\" ng-show=\"isLoggedIn\">\n" +
+    "        <a class=\"btn btn-warning\" href=\"#/tradeflow/buy/instrument/{{symbol}}\">BUY</a>\n" +
+    "        <a class=\"btn btn-warning\" ng-class=\"{disabled: sellDisabled}\" href=\"#/tradeflow/sell/instrument/{{symbol}}\">SELL</a>\n" +
+    "    </div>\n" +
     "</div>");
 }]);
 
@@ -912,11 +1018,11 @@ angular.module("widgets/tradeflow/confirm.tpl.html", []).run(["$templateCache", 
     "		</tr>\n" +
     "		<tr>\n" +
     "			<td>Commission:</td>\n" +
-    "			<td>{{commission}}</td>\n" +
+    "			<td>{{commission | number:2}}</td>\n" +
     "		</tr>\n" +
     "		<tr>\n" +
     "			<td>Estimated total:</td>\n" +
-    "			<td>{{total}}</td>\n" +
+    "			<td>{{total | number:2}}</td>\n" +
     "		</tr>	\n" +
     "\n" +
     "	</table>\n" +
@@ -927,6 +1033,7 @@ angular.module("widgets/tradeflow/reciept.tpl.html", []).run(["$templateCache", 
   $templateCache.put("widgets/tradeflow/reciept.tpl.html",
     "<div>\n" +
     "<h1>Reciept</h1>\n" +
+    "    <p>Thank you for your order. It is being processed now...</p>\n" +
     "</div>");
 }]);
 

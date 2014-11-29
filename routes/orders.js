@@ -1,3 +1,4 @@
+'use strict';
 var errors = require('../errors'),
 User = require('../db/models/user'),
 Transaction = require('../db/models/transaction'),
@@ -18,7 +19,7 @@ module.exports = function(router) {
 
       var createTransaction = function(stocks) {     
         return new Promise(function(resolve, reject) {
-          var price = (order.action=='buy')?stocks[0].ask:stocks[0].bid;
+          var price = (order.action==='buy')?stocks[0].ask:stocks[0].bid;
           var transaction = new Transaction({
             action : order.action,
             custodyId : order.custody._id,
@@ -42,29 +43,29 @@ module.exports = function(router) {
 
       var updateUser = function(transaction) {
         return new Promise(function(resolve, reject){
-          if (transaction.action=='buy') {
-            cashAccount.balance -= transaction.amount*transaction.price - transaction.commission;
+          if (transaction.action==='buy') {
+            cashAccount.balance -= (transaction.amount*transaction.price + transaction.commission);
           } else {
-            cashAccount.balance += transaction.amount*transaction.price - transaction.commission;
+            cashAccount.balance += (transaction.amount*transaction.price - transaction.commission);
           }
 
           var holding = null;
           custodyAccount.holdings.forEach(function(h){
-            if (h.symbol==transaction.symbol) {
+            if (h.symbol===transaction.symbol) {
               holding = h;
             }
           });
 
-          if (holding && transaction.action == 'buy') {
+          if (holding && transaction.action === 'buy') {
             holding.amount += transaction.amount;
-          } else if (holding && transaction.action == 'sell') {
+          } else if (holding && transaction.action === 'sell') {
             holding.amount -=transaction.amount;
           } else {
             holding = {
               amount : transaction.amount,
               symbol : transaction.symbol,
               avgPurchasePrice : transaction.price
-            }
+            };
             custodyAccount.holdings.push(holding);
           }
           user.save(function(err, user){

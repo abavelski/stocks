@@ -8648,3 +8648,38 @@ a.clickable:hover {
     display: block;
   }
 }
+
+.hero-widget {
+  padding-top: 10px;
+  padding-bottom: 10px;
+  text-align: center;
+}
+
+.hero-widget var {
+  display: block;
+  height: 32px;
+  font-size: 32px;
+  font-style: normal;
+  line-height: 32px;
+}
+
+.hero-widget label {
+  font-size: 17px;
+}
+
+.hero-widget .options {
+  margin-top: 10px;
+}
+
+.zero-padding {
+  padding-right: 0;
+  padding-left: 0;
+}
+
+.zero-padding-left {
+  padding-left: 0;
+}
+
+.zero-padding-right {
+  padding-right: 0;
+}

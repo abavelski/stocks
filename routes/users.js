@@ -1,3 +1,4 @@
+'use strict';
 var errors = require('../errors'),
   User = require('../db/models/user'),
   Transaction = require('../db/models/transaction'),
@@ -67,7 +68,7 @@ router.route('/auth/instruments').get(function(req, res){
         .getStocks()
         .then(function(stocks) {
           console.log(stocks);
-          result = {};
+          var result = {};
           for (var i = 0; i<stocks.length; i++) {
             stocks[i].lastTradePrice = Number(stocks[i].lastTradePrice);
             result[stocks[i].symbol] = stocks[i];
@@ -102,6 +103,47 @@ router.route('/auth/cash-account').post(function(req, res){
     });
 });
 
+  router.route('/auth/user/summary').get(function(req, res){
+    User.findById(req.user.id).exec().then(function(user){
+      var symbols = user.getAllSymbols();
+      console.log('symbols:',symbols);
+      stockInfo
+          .forSymbols(symbols)
+          .withFields(['symbol', 'name', 'lastTradePrice'])
+          .getStocks()
+          .then(function(stocks) {
+            console.log(stocks);
+            var i=0, cash=0, holdingsTotal=0, pl=0, stockMap = {};
+            for (i = 0; i<stocks.length; i++) {
+              stockMap[stocks[i].symbol] = Number(stocks[i].lastTradePrice);
+            }
+            for (i = 0; i < user.cashAccounts.length; i++) {
+              cash+=user.cashAccounts[i].balance;
+            }
+            for (i = 0; i < user.custodyAccounts.length; i++) {
+              var custodyAccount = user.custodyAccounts[i];
+                for (var j = 0; j < custodyAccount.holdings.length; j++) {
+                var holding = custodyAccount.holdings[j];
+                  var price = stockMap[holding.symbol];
+                  holdingsTotal+=holding.amount*price;
+                  pl+=holding.amount*(price-holding.avgPurchasePrice);
+              }
+            }
+            res.json({
+              total : cash+holdingsTotal,
+              cash : cash,
+              holdings : holdingsTotal,
+              pl : pl
+            });
+          },
+          function(err) {
+            res.send(500).end();
+          });
+    }, function(err){
+      res.send(500).end();
+    });
+
+  });
 
 
 };

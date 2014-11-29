@@ -1,4 +1,4 @@
-angular.module('templates.app', ['header.tpl.html', 'widgets/assetoverview/assetoverview.tpl.html', 'widgets/assetoverview/pager.tpl.html', 'widgets/cashaccounts/cashaccounts.tpl.html', 'widgets/custodies/custodies.tpl.html', 'widgets/custodyselector/custodyselector.tpl.html', 'widgets/graph/graph.tpl.html', 'widgets/instrumentlist/instrumentList.tpl.html', 'widgets/instrumentlist/pager.tpl.html', 'widgets/register/registerOk.tpl.html', 'widgets/register/registerUser.tpl.html', 'widgets/search/search.tpl.html', 'widgets/search/typeahead.tpl.html', 'widgets/stockinfo/stockInfo.tpl.html', 'widgets/tradeflow/confirm.tpl.html', 'widgets/tradeflow/reciept.tpl.html', 'widgets/tradeflow/select.tpl.html', 'widgets/tradeflow/tradeflow.tpl.html']);
+angular.module('templates.app', ['header.tpl.html', 'widgets/assetoverview/assetoverview.tpl.html', 'widgets/assetoverview/pager.tpl.html', 'widgets/cashaccounts/cashaccounts.tpl.html', 'widgets/custodies/custodies.tpl.html', 'widgets/custodyselector/custodyselector.tpl.html', 'widgets/graph/graph.tpl.html', 'widgets/instrumentlist/instrumentList.tpl.html', 'widgets/instrumentlist/pager.tpl.html', 'widgets/maindashboard/dashboard.tpl.html', 'widgets/register/registerOk.tpl.html', 'widgets/register/registerUser.tpl.html', 'widgets/search/search.tpl.html', 'widgets/search/typeahead.tpl.html', 'widgets/stockinfo/stockInfo.tpl.html', 'widgets/tradebuttons/tradebuttons.tpl.html', 'widgets/tradeflow/confirm.tpl.html', 'widgets/tradeflow/reciept.tpl.html', 'widgets/tradeflow/select.tpl.html', 'widgets/tradeflow/tradeflow.tpl.html']);
 
 angular.module("header.tpl.html", []).run(["$templateCache", function($templateCache) {
   $templateCache.put("header.tpl.html",
@@ -33,10 +33,10 @@ angular.module("widgets/assetoverview/assetoverview.tpl.html", []).run(["$templa
     "	<table ng-table=\"tableParams\" template-pagination=\"widgets/assetoverview/pager.tpl.html\" class=\"table\">\n" +
     "        <tr ng-repeat=\"holding in $data\">            \n" +
     "            <td data-title=\"'Name'\"><a href=\"#/instrument/{{holding.symbol}}/details\">{{holding.name}}</a></td>\n" +
-    "            <td data-title=\"'Symbol'\">{{holding.symbol}}</td>\n" +
-    "            <td data-title=\"'Last'\">{{holding.last}}</td>\n" +
+    "            <td data-title=\"'Last'\">{{holding.last | number:2}}</td>\n" +
     "            <td data-title=\"'Amount'\">{{holding.amount}}</td>\n" +
-    "            <td data-title=\"'Avg. purchase price'\">{{holding.avgPurchasePrice}}</td>\n" +
+    "            <td data-title=\"'Total'\">{{holding.total | number:2}}</td>\n" +
+    "            <td data-title=\"'Profit/Loss'\">{{holding.pl | number:2}}</td>\n" +
     "        </tr>\n" +
     "        </table>\n" +
     "    </div>\n" +
@@ -126,7 +126,7 @@ angular.module("widgets/custodyselector/custodyselector.tpl.html", []).run(["$te
     "    <div class=\"clearfix margin-bottom-20\">\n" +
     "\n" +
     "    	    <div class=\"pull-right btn-group\" dropdown is-open=\"status.isopen\">\n" +
-    "      <button type=\"button\" class=\"btn btn-primary dropdown-toggle\" ng-disabled=\"disabled\">\n" +
+    "      <button type=\"button\" class=\"btn btn-warning dropdown-toggle\" ng-disabled=\"disabled\">\n" +
     "        {{custody.name}}<span class=\"caret\"></span>\n" +
     "      </button>\n" +
     "      <ul class=\"dropdown-menu\" role=\"menu\">\n" +
@@ -180,6 +180,51 @@ angular.module("widgets/instrumentlist/pager.tpl.html", []).run(["$templateCache
     "            <a ng-switch-when=\"next\" ng-click=\"params.page(page.number)\" href=\"\">Next &raquo;</a>\n" +
     "          </li>\n" +
     "        </ul>");
+}]);
+
+angular.module("widgets/maindashboard/dashboard.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("widgets/maindashboard/dashboard.tpl.html",
+    "<div ng-controller=\"DashboardCtrl\">\n" +
+    "        <div class=\"row\">\n" +
+    "            <div class=\"col-sm-3 col-xs-4 zero-padding-right\">\n" +
+    "                <div class=\"hero-widget well well-sm\">\n" +
+    "                    <div class=\"text\">\n" +
+    "                        <var>{{summary.total | number:2}}</var>\n" +
+    "                        <label class=\"text-muted\">Total</label>\n" +
+    "                    </div>\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "            <div class=\"col-sm-3 col-xs-4 zero-padding\">\n" +
+    "                <div class=\"hero-widget well well-sm\">\n" +
+    "                    <div class=\"text\">\n" +
+    "                        <var>{{summary.holdings | number:2}}</var>\n" +
+    "                        <label class=\"text-muted\">Holdings</label>\n" +
+    "                    </div>\n" +
+    "\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "            <div class=\"col-sm-3 zero-padding hidden-xs\">\n" +
+    "                <div class=\"hero-widget well well-sm\">\n" +
+    "                    <div class=\"text\">\n" +
+    "                        <var>{{summary.cash | number:2}}</var>\n" +
+    "                        <label class=\"text-muted\">Cash</label>\n" +
+    "                    </div>\n" +
+    "\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "            <div class=\"col-sm-3 col-xs-4 zero-padding-left\">\n" +
+    "                <div class=\"hero-widget well well-sm\">\n" +
+    "                    <div class=\"text\">\n" +
+    "                        <var>{{summary.pl | number:2}}</var>\n" +
+    "                        <label class=\"text-muted\">Profit/Loss</label>\n" +
+    "                    </div>\n" +
+    "\n" +
+    "                </div>\n" +
+    "            </div>\n" +
+    "        </div>\n" +
+    "\n" +
+    "\n" +
+    "</div>");
 }]);
 
 angular.module("widgets/register/registerOk.tpl.html", []).run(["$templateCache", function($templateCache) {
@@ -262,7 +307,6 @@ angular.module("widgets/stockinfo/stockInfo.tpl.html", []).run(["$templateCache"
   $templateCache.put("widgets/stockinfo/stockInfo.tpl.html",
     "<div ng-controller=\"StockInfoCtrl\">\n" +
     "<widget title=\"Stock Info\" minimizable=\"true\" removable=\"true\">\n" +
-    "	<a class=\"btn btn-primary\" href=\"#/tradeflow/buy/instrument/{{symbol}}\">BUY</a>\n" +
     "	<table ng-table=\"tableParams\" class=\"table\">\n" +
     "        <tr ng-repeat=\"row in $data\">\n" +
     "            <td>{{row.name}}</td>\n" +
@@ -270,6 +314,16 @@ angular.module("widgets/stockinfo/stockInfo.tpl.html", []).run(["$templateCache"
     "        </tr>\n" +
     "        </table>\n" +
     "</widget>\n" +
+    "</div>");
+}]);
+
+angular.module("widgets/tradebuttons/tradebuttons.tpl.html", []).run(["$templateCache", function($templateCache) {
+  $templateCache.put("widgets/tradebuttons/tradebuttons.tpl.html",
+    "<div ng-controller=\"TradeButtonsCtrl\">\n" +
+    "    <div class=\"margin-bottom-20\" ng-show=\"isLoggedIn\">\n" +
+    "        <a class=\"btn btn-warning\" href=\"#/tradeflow/buy/instrument/{{symbol}}\">BUY</a>\n" +
+    "        <a class=\"btn btn-warning\" ng-class=\"{disabled: sellDisabled}\" href=\"#/tradeflow/sell/instrument/{{symbol}}\">SELL</a>\n" +
+    "    </div>\n" +
     "</div>");
 }]);
 
@@ -300,11 +354,11 @@ angular.module("widgets/tradeflow/confirm.tpl.html", []).run(["$templateCache", 
     "		</tr>\n" +
     "		<tr>\n" +
     "			<td>Commission:</td>\n" +
-    "			<td>{{commission}}</td>\n" +
+    "			<td>{{commission | number:2}}</td>\n" +
     "		</tr>\n" +
     "		<tr>\n" +
     "			<td>Estimated total:</td>\n" +
-    "			<td>{{total}}</td>\n" +
+    "			<td>{{total | number:2}}</td>\n" +
     "		</tr>	\n" +
     "\n" +
     "	</table>\n" +
@@ -315,6 +369,7 @@ angular.module("widgets/tradeflow/reciept.tpl.html", []).run(["$templateCache", 
   $templateCache.put("widgets/tradeflow/reciept.tpl.html",
     "<div>\n" +
     "<h1>Reciept</h1>\n" +
+    "    <p>Thank you for your order. It is being processed now...</p>\n" +
     "</div>");
 }]);
 

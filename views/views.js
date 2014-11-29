@@ -4,14 +4,14 @@ module.exports = {
     "path" : "/instruments", 
     "type" : "twelveZeroZero", 
     "widgets" : {
-      "north" : ["search", "instrumentList"]          
+      "north" : ["instrumentList"]
     }
   },
   {
     "path" : "/instrument/:symbol/details",
     "type" : "twelveSixSix",
     "widgets" : {
-      "north" : ["search"],
+      "north" : ["tradeButtons"],
       "east" : ["stockInfo"],
       "west" : ["graph"]
     }
@@ -32,8 +32,9 @@ module.exports = {
   },
   {
     "path" : "/home",
-    "type" : "zeroSixSix",
+    "type" : "twelveSixSix",
     "widgets" : {
+      "north": ["dashboard"],
       "east" : ["custodies"],
       "west" : ["cashAccounts"]
     }
