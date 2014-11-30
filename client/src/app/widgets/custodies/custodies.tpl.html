@@ -1,0 +1,29 @@
+<widget title="Custodies" minimizable="true">
+	<div ng-controller="CustodiesCtrl">
+		<div ng-show="error" class="alert alert-danger" role="alert">{{error}}</div>
+		<table ng-table="tableParams" class="table">
+			<tr ng-repeat="custody in $data">
+				<td data-title="'Name'"><a href="#/assetoverview/{{custody._id}}">{{custody.name}}</a></td>
+				<td data-title="'Total'">{{custody.total | number:2}}</td>
+			</tr>
+			<tr>
+    			<td></td>
+    			<td><b>{{custodiesTotal | number:2}}</b></td>
+			</tr>
+		</table>
+		
+		<div ng-show="isAddCustodyAllowed()">
+		<h4>Add new custody</h4>
+		<form class="form-inline" role="form">
+			<div class="form-group">
+				<label class="sr-only" for="custodyName">Name</label>
+				<input type="text" ng-model="custody.name" class="form-control" id="custodyName" placeholder="Enter custody name">
+			</div>
+			<button id="add-custody" type="submit" ng-click="addCustody()" class="btn btn-default">Add</button>
+		</form>
+	</div>
+
+	</div>	
+
+
+</widget>

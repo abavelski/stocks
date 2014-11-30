@@ -1,0 +1,34 @@
+<div>
+	<h2>Confirm purchase</h2>
+	<table class="table">
+		<tr>
+			<td>Order type:</td>
+			<td>{{order.orderType}}</td>
+		</tr>
+		<tr>
+			<td>Paper:</td>
+			<td>{{instrument.name}}</td>
+		</tr>
+		<tr>
+			<td>Custody:</td>
+			<td>{{order.custody.name}}</td>
+		</tr>
+		<tr>
+			<td>Cash account:</td>
+			<td>{{order.cashAccount.name}}</td>
+		</tr>
+		<tr>
+			<td>Amount:</td>
+			<td>{{order.amount}}</td>
+		</tr>
+		<tr>
+			<td>Commission:</td>
+			<td>{{commission | number:2}}</td>
+		</tr>
+		<tr>
+			<td>Estimated total:</td>
+			<td>{{total | number:2}}</td>
+		</tr>	
+
+	</table>
+</div>

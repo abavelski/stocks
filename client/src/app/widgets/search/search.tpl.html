@@ -1,0 +1,9 @@
+<div class="margin-bottom-20" ng-controller="SearchCtrl">
+	<h4>Search for companies</h4>
+    <input type="text" ng-model="selected" typeahead="company as company.name for company in getCompanies($viewValue)" typeahead-loading="loadingCompanies" 
+    typeahead-min-length="3" 
+    typeahead-template-url="widgets/search/typeahead.tpl.html" 
+    typeahead-on-select='onSelect($item, $model, $label)' class="form-control">
+    <i ng-show="loadingCompanies" class="glyphicon glyphicon-refresh"></i>
+
+</div>

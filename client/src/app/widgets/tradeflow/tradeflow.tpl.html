@@ -1,0 +1,30 @@
+<div ng-controller="TradeFlowCtrl">
+
+  <div class="panel panel-primary">
+    <div class="panel-heading text-uppercase">{{order.action}} {{instrument.name}}</div>
+    <div class="panel-body" style="min-height:300px;">
+      <wizard current-step="currentStep" template='wizard/wizard.tpl.html'> 
+        <wz-step title="select">
+        <div ng-include="'widgets/tradeflow/select.tpl.html'"></div>
+      </wz-step>
+      <wz-step title="confirm">
+      <div ng-include="'widgets/tradeflow/confirm.tpl.html'"></div>
+    </wz-step>
+    <wz-step title="reciept">
+    <div ng-include="'widgets/tradeflow/reciept.tpl.html'"></div>
+  </wz-step>  
+</wizard>
+</div>
+
+<div class="panel-footer">  
+  <div class="pull-right">
+    <a type="button" class="btn btn-warning" href="#">Cancel</a>
+    <button type="button" class="btn btn-primary" ng-click="next()">{{nextBtn}}</button>
+  </div>
+  <div class="clearfix"></div>
+</div>
+</div>
+
+
+
+</div>

@@ -1,0 +1,14 @@
+<widget title="Instruments" minimizable="true">
+	<div ng-controller="InstrumentListCtrl">
+	<table ng-table="tableParams" template-pagination="widgets/instrumentlist/pager.tpl.html" class="table">
+        <tr ng-repeat="company in $data">
+            <td data-title="'Name'"><a href="#/instrument/{{company.symbol}}/details">{{company.name}}</a></td>
+            <td data-title="'Exchange'">{{company.exchange}}</td>
+            <td data-title="'Change'">{{company.changePercent}}</td>
+            <td data-title="'Bid'">{{company.bid}}</td>
+            <td data-title="'Ask'">{{company.ask}}</td>
+            <td data-title="'Last'">{{company.lastTradePrice}}</td>
+        </tr>
+        </table>
+    </div>
+</widget>

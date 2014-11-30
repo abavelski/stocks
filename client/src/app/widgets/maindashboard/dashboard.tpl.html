@@ -1,0 +1,41 @@
+<div ng-controller="DashboardCtrl">
+        <div class="row">
+            <div class="col-sm-3 col-xs-4 zero-padding-right">
+                <div class="hero-widget well well-sm">
+                    <div class="text">
+                        <var>{{summary.total | number:2}}</var>
+                        <label class="text-muted">Total</label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-3 col-xs-4 zero-padding">
+                <div class="hero-widget well well-sm">
+                    <div class="text">
+                        <var>{{summary.holdings | number:2}}</var>
+                        <label class="text-muted">Holdings</label>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-sm-3 zero-padding hidden-xs">
+                <div class="hero-widget well well-sm">
+                    <div class="text">
+                        <var>{{summary.cash | number:2}}</var>
+                        <label class="text-muted">Cash</label>
+                    </div>
+
+                </div>
+            </div>
+            <div class="col-sm-3 col-xs-4 zero-padding-left">
+                <div class="hero-widget well well-sm">
+                    <div class="text">
+                        <var>{{summary.pl | number:2}}</var>
+                        <label class="text-muted">Profit/Loss</label>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+</div>

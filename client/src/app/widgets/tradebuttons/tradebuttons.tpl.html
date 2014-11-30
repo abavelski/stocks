@@ -1,0 +1,6 @@
+<div ng-controller="TradeButtonsCtrl">
+    <div class="margin-bottom-20" ng-show="isLoggedIn">
+        <a class="btn btn-warning" href="#/tradeflow/buy/instrument/{{symbol}}">BUY</a>
+        <a class="btn btn-warning" ng-class="{disabled: sellDisabled}" href="#/tradeflow/sell/instrument/{{symbol}}">SELL</a>
+    </div>
+</div>

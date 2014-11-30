@@ -1,0 +1,15 @@
+<ul class="nav navbar-nav navbar-right">
+  <li ng-show="isAuthenticated()">
+    <p class="navbar-text"><span class="glyphicon glyphicon-user"></span>{{currentUser}}</p>
+  </li>
+    <li ng-show="isAuthenticated()">
+          <a href ng-click="logout()">Log out</a>
+  </li>
+  <li ng-hide="isAuthenticated()">
+          <a id="toolbar-login" href ng-click="login()">Log in</a>
+  </li>
+    <li ng-hide="isAuthenticated()">
+          <a id="toolbar-register" href="#/register">Register</a>
+  </li>
+
+</ul>

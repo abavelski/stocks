@@ -1,0 +1,26 @@
+<widget title="Cash Accounts" minimizable="true">
+	<div ng-controller="CashAccountsCtrl">
+		<div ng-show="error" class="alert alert-danger" role="alert">{{error}}</div>
+		<table ng-table="tableParams" class="table">
+			<tr ng-repeat="cashAccount in cashAccounts">
+				<td data-title="'Name'">{{cashAccount.name}}</td>
+				<td data-title="'Currency'">{{cashAccount.currency}}</td>
+				<td data-title="'Balance'">{{cashAccount.balance | number:2}}</td>
+			</tr>
+		</table>
+		
+		<div ng-show="isAddCashAccountAllowed()">
+		<h4>Add new cash account</h4>
+		<form class="form-inline" role="form">
+			<div class="form-group">
+				<label class="sr-only" for="cashAccountName">Name</label>
+				<input type="text" ng-model="cashAccount.name" class="form-control" id="cashAccountName" placeholder="Enter cash account name">
+			</div>
+			<button type="submit" ng-click="addCashAccount()" class="btn btn-default">Add</button>
+		</form>
+	</div>
+
+	</div>	
+
+
+</widget>

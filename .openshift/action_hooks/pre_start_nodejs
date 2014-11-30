@@ -1,0 +1,15 @@
+#!/bin/bash
+echo "Exporting Node Environment (production)"
+export NODE_ENV=production
+export XDG_CONFIG_HOME="${OPENSHIFT_REPO_DIR}"/.config/bower
+export XDG_DATA_HOME="${OPENSHIFT_REPO_DIR}"/share/bower
+export XDG_CACHE_HOME="${OPENSHIFT_REPO_DIR}"/.cache/bower
+
+if [ -f "${OPENSHIFT_REPO_DIR}"/bower.json ]; then
+    (cd "${OPENSHIFT_REPO_DIR}"; node_modules/bower/bin/bower install)
+fi
+ 
+# If there is a grunt file, run $ grunt build
+if [ -f "${OPENSHIFT_REPO_DIR}"/gruntFile.js ]; then
+    (cd "${OPENSHIFT_REPO_DIR}"; node_modules/grunt-cli/bin/grunt)
+fi

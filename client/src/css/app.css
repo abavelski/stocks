@@ -1,0 +1,394 @@
+body {
+  padding-top: 50px;
+}
+.starter-template {
+  padding: 40px 15px;
+  text-align: center;
+}
+
+.margin-top-20 {
+  margin-top: 20px;
+}
+
+.margin-bottom-20 {
+  margin-bottom: 20px;
+}
+
+.clickable
+{
+    cursor: pointer;
+}
+
+.clickable .glyphicon
+{
+    background: rgba(0, 0, 0, 0.15);
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 4px;
+    margin-right : 3px;
+}
+
+.panel-heading span
+{
+    margin-top: -23px;
+    font-size: 15px;
+    margin-right: -9px;
+}
+a.clickable { color: inherit; }
+a.clickable:hover { text-decoration:none; }
+
+.steps-indicator {
+  position: relative;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: 30px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.steps-indicator:before {
+  position: absolute;
+  height: 1px;
+  background-color: #e6e6e6;
+  content: '';
+}
+
+.steps-indicator.steps-2:before {
+  right: calc(25%);
+  left: calc(25%);
+}
+
+.steps-indicator.steps-3:before {
+  right: calc(17%);
+  left: calc(15%);
+}
+
+.steps-indicator.steps-4:before {
+  right: calc(12.5%);
+  left: calc(12.5%);
+}
+
+.steps-indicator.steps-5:before {
+  right: calc(10%);
+  left: calc(10%);
+}
+
+.steps-indicator.steps-6:before {
+  right: calc(8.333333333333334%);
+  left: calc(8.333333333333334%);
+}
+
+.steps-indicator.steps-7:before {
+  right: calc(7.142857142857143%);
+  left: calc(7.142857142857143%);
+}
+
+.steps-indicator.steps-8:before {
+  right: calc(6.25%);
+  left: calc(6.25%);
+}
+
+.steps-indicator.steps-9:before {
+  right: calc(5.555555555555555%);
+  left: calc(5.555555555555555%);
+}
+
+.steps-indicator.steps-10:before {
+  right: calc(5%);
+  left: calc(5%);
+}
+
+.steps-indicator * {
+  -webkit-box-sizing: border-box;
+     -moz-box-sizing: border-box;
+          box-sizing: border-box;
+}
+
+.steps-indicator li {
+  position: relative;
+  float: left;
+  padding: 0;
+  padding-top: 10px;
+  margin: 0;
+  line-height: 15px;
+  text-align: center;
+}
+
+.steps-indicator li a {
+  font-weight: bold;
+  color: #808080;
+  text-decoration: none;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: 0.25s;
+}
+
+.steps-indicator li a:before {
+  position: absolute;
+  top: -7px;
+  left: calc(43%);
+  width: 14px;
+  height: 14px;
+  background-color: #e6e6e6;
+  border-radius: 100%;
+  content: '';
+  transition: 0.25s;
+}
+
+.steps-indicator li a:hover {
+  color: #4d4d4d;
+}
+
+.steps-indicator.steps-2 li {
+  width: calc(50%);
+}
+
+.steps-indicator.steps-3 li {
+  width: calc(33.333333333333336%);
+}
+
+.steps-indicator.steps-4 li {
+  width: calc(25%);
+}
+
+.steps-indicator.steps-5 li {
+  width: calc(20%);
+}
+
+.steps-indicator.steps-6 li {
+  width: calc(16.666666666666668%);
+}
+
+.steps-indicator.steps-7 li {
+  width: calc(14.285714285714286%);
+}
+
+.steps-indicator.steps-8 li {
+  width: calc(12.5%);
+}
+
+.steps-indicator.steps-9 li {
+  width: calc(11.11111111111111%);
+}
+
+.steps-indicator.steps-10 li {
+  width: calc(10%);
+}
+
+.steps-indicator.steps-11 li {
+  width: calc(9.090909090909092%);
+}
+
+.steps-indicator li.default {
+  pointer-events: none;
+}
+
+.steps-indicator li.default a:hover {
+  color: #808080;
+}
+
+.steps-indicator li.current,
+.steps-indicator li.editing {
+  pointer-events: none;
+}
+
+.steps-indicator li.current a:before {
+  background-color: #808080;
+}
+
+.steps-indicator li.done a:before {
+  background-color: #339933;
+}
+
+.steps-indicator li.editing a:before {
+  background-color: #ff0000;
+}
+
+
+
+.offer:hover {
+    -webkit-transform: scale(1.03); 
+    -moz-transform: scale(1.03); 
+    -ms-transform: scale(1.03); 
+    -o-transform: scale(1.03); 
+    transform:rotate scale(1.03); 
+    -webkit-transition: all 0.4s ease-in-out; 
+-moz-transition: all 0.4s ease-in-out; 
+-o-transition: all 0.4s ease-in-out;
+transition: all 0.4s ease-in-out;
+    }
+
+.invoice-title h2, .invoice-title h3 {
+    display: inline-block;
+}
+
+.table > tbody > tr > .no-line {
+    border-top: none;
+}
+
+.table > thead > tr > .no-line {
+    border-bottom: none;
+}
+
+.table > tbody > tr > .thick-line {
+    border-top: 2px solid;
+}
+
+.ng-table th {
+  text-align: left;
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+.ng-table th.sortable {
+  cursor: pointer;
+}
+.ng-table th.sortable div {
+  padding-right: 18px;
+  position: relative;
+}
+.ng-table th.sortable div:after,
+.ng-table th.sortable div:before {
+  content: "";
+  border-width: 0 4px 4px;
+  border-style: solid;
+  border-color: #000 transparent;
+  visibility: visible;
+  right: 8px;
+  top: 50%;
+  position: absolute;
+  opacity: .3;
+  margin-top: -4px;
+}
+.ng-table th.sortable div:before {
+  margin-top: 2px;
+  border-bottom: none;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #000;
+}
+.ng-table th.sortable div:hover:after,
+.ng-table th.sortable div:hover:before {
+  opacity: 1;
+  visibility: visible;
+}
+.ng-table th.sortable.sort-desc,
+.ng-table th.sortable.sort-asc {
+  background-color: rgba(141, 192, 219, 0.25);
+  text-shadow: 0 1px 1px rgba(255, 255, 255, 0.75);
+}
+.ng-table th.sortable.sort-desc div:after,
+.ng-table th.sortable.sort-asc div:after {
+  margin-top: -2px;
+}
+.ng-table th.sortable.sort-desc div:before,
+.ng-table th.sortable.sort-asc div:before {
+  visibility: hidden;
+}
+.ng-table th.sortable.sort-asc div:after,
+.ng-table th.sortable.sort-asc div:hover:after {
+  visibility: visible;
+  filter: alpha(opacity=60);
+  -khtml-opacity: 0.6;
+  -moz-opacity: 0.6;
+  opacity: 0.6;
+}
+.ng-table th.sortable.sort-desc div:after {
+  border-bottom: none;
+  border-left: 4px solid transparent;
+  border-right: 4px solid transparent;
+  border-top: 4px solid #000;
+  visibility: visible;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+  filter: alpha(opacity=60);
+  -khtml-opacity: 0.6;
+  -moz-opacity: 0.6;
+  opacity: 0.6;
+}
+.ng-table th.filter .input-filter {
+  margin: 0;
+  display: block;
+  width: 100%;
+  min-height: 30px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+.ng-table + .pagination {
+  margin-top: 0;
+}
+@media only screen and (max-width: 800px) {
+  .ng-table-responsive {
+    border-bottom: 1px solid #999999;
+  }
+  .ng-table-responsive tr {
+    border-top: 1px solid #999999;
+    border-left: 1px solid #999999;
+    border-right: 1px solid #999999;
+  }
+  .ng-table-responsive td:before {
+    position: absolute;
+    padding: 8px;
+    left: 0;
+    top: 0;
+    width: 50%;
+    white-space: nowrap;
+    text-align: left;
+    font-weight: bold;
+  }
+  .ng-table-responsive thead tr th {
+    text-align: left;
+  }
+  .ng-table-responsive thead tr.ng-table-filters th {
+    padding: 0;
+  }
+  .ng-table-responsive thead tr.ng-table-filters th form > div {
+    padding: 8px;
+  }
+  .ng-table-responsive td {
+    border: none;
+    border-bottom: 1px solid #eeeeee;
+    position: relative;
+    padding-left: 50%;
+    white-space: normal;
+    text-align: left;
+  }
+  .ng-table-responsive td:before {
+    content: attr(data-title-text);
+  }
+  .ng-table-responsive,
+  .ng-table-responsive thead,
+  .ng-table-responsive tbody,
+  .ng-table-responsive th,
+  .ng-table-responsive td,
+  .ng-table-responsive tr {
+    display: block;
+  }
+}
+
+.hero-widget { text-align: center; padding-top: 10px; padding-bottom: 10px; }
+.hero-widget var { display: block; height: 32px; font-size: 32px; line-height: 32px; font-style: normal; }
+.hero-widget label { font-size: 17px; }
+.hero-widget .options { margin-top: 10px; }
+
+
+.zero-padding {
+  padding-left: 0px;
+  padding-right: 0px;
+}
+
+.zero-padding-left {
+  padding-left: 0px;
+}
+
+.zero-padding-right {
+  padding-right: 0px;
+}
+

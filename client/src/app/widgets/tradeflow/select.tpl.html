@@ -1,0 +1,32 @@
+<div>
+	<br>
+<form class="form-horizontal" role="form">
+    <div class="form-group">
+    <label for="orderType" class="col-sm-3 control-label">Order type</label>
+    <div class="col-sm-9">
+      <select class="form-control" id="orderType" ng-model="order.orderType" ng-options="type for type in orderTypes" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="custody" class="col-sm-3 control-label">Custody</label>
+    <div class="col-sm-9">
+      <select class="form-control" id="custody" ng-model="order.custody" ng-options="custody.name for custody in custodies" />
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="cashAcc" class="col-sm-3 control-label">Cash Account</label>
+    <div class="col-sm-9">
+      <select class="form-control" id="cashAcc" ng-model="order.cashAccount" ng-options="cashAccount.name for cashAccount in cashAccounts"/>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="amount" class="col-sm-3 control-label">Amount</label>
+    <div class="col-sm-9">
+      <input type="number" class="form-control" id="amount" ng-model="order.amount" />
+    </div>
+  </div>
+
+</form>
+
+</div>
